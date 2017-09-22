@@ -92,12 +92,14 @@ def delete_device(api_key,device_id):
 key=input('-----\nChoose a selection:\n    n: create device and add datastreams(新建)\n    r: reset thresholds to default values(重置).\n    d: delete device and recreate device(删除)\n------\nYour choice is: ')
 if key in ['n','N']:
     api_key,device_id=register_device()
-    with open('api_id.txt','w') as f:
+    with open('./output/api_id.lua','w',newline='') as f:
         #用于配合NodeMCU读入文件格式
-        f.write('api-key:'+api_key)
-        f.write('\n')
-        f.write(device_id)
-        f.write('\n')
+        #f.write('api-key:'+api_key)
+        #f.write('\n')
+        #f.write(device_id)
+        #f.write('\n')
+        f.writelines('api-key:'+api_key+'\n')
+        f.writelines(device_id)
     for id in datastream_ids:
         add_datastream(id,api_key,device_id)
     add_datapoints(api_key,device_id)
