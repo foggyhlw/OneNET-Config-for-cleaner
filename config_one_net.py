@@ -52,14 +52,14 @@ datastream_ids=['cmd','off_threshold','low_threshold','medium_threshold','high_t
 #for fishtank controller
 #datastream_ids=['manual_cmd','温度','过热保护']
 
-def add_datapoints(api_key,device_id):
+def add_datapoints(api_key,device_id,off=10,low=50,medium=100,high=160):
     url='http://api.heclouds.com/devices/{0}/datapoints'.format(device_id)
     header={'api-key':api_key}
     #for Cleaner
-    data={'datastreams':[{'id':'off_threshold','datapoints':[{"value":20}]},
-        {'id':'low_threshold','datapoints':[{"value":50}]},
-        {'id':'medium_threshold','datapoints':[{"value":80}]},
-        {'id':'high_threshold','datapoints':[{"value":160}]},
+    data={'datastreams':[{'id':'off_threshold','datapoints':[{"value":off}]},
+        {'id':'low_threshold','datapoints':[{"value":low}]},
+        {'id':'medium_threshold','datapoints':[{"value":medium}]},
+        {'id':'high_threshold','datapoints':[{"value":high}]},
         {'id':'cmd','datapoints':[{"value":0}]}]}
 
     #for fishtank controller
@@ -89,7 +89,8 @@ def delete_device(api_key,device_id):
     else:
     	print('delete device FAILED!')
 
-key=input('-----\nChoose a selection:\n    n: create device and add datastreams(新建)\n    r: reset thresholds to default values(重置).\n    d: delete device and recreate device(删除)\n------\nYour choice is: ')
+key=input('-----\nChoose a selection:\n    n: create device and add datastreams(新建)\n    r: reset thresholds to default values(重置).\n    s: set thresholds manualy(手动设定).\n    d: delete device and recreate device(删除)\n------\nYour choice is: ')
+key=key.strip()
 if key in ['n','N']:
     api_key,device_id=register_device()
     with open('./output/api_id.lua','w',newline='') as f:
@@ -109,4 +110,21 @@ if key in ['r','R']:
 if key in ['d','D']:
     api_key,device_id=register_device()
     delete_device(api_key,device_id)
+if key in ['s','S']:
+	api_key,device_id=register_device()
+	threshold_values=input('input 4 values,sepreated by dot (输入4个设定值，以逗号或空格分隔):  ')
+	try:
+		if(len(threshold_values.split(',')))==4 :
+			threshold_values=threshold_values.split(',')
+		else:
+			threshold_values=threshold_values.split(' ')
+		
+		if len(threshold_values)!=4 :
+			print('incorrect Number of values!(需要输入4个值)')
+		else:
+			threshold_values=[int(i) for i in threshold_values]
+			add_datapoints(api_key,device_id,*threshold_values)
+	except:
+		print('input values incorrect!（输入值格式错误）')
+
 key=input()
