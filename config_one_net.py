@@ -99,7 +99,13 @@ def delete_device(api_key, device_id):
         print('delete device FAILED!')
 
 
-key = input('-----\nChoose a selection:\n    n: create device and add datastreams(新建)\n    r: reset thresholds to default values(重置).\n    s: set thresholds manualy(手动设定).\n    d: delete device and recreate device(删除)\n------\nYour choice is: ')
+key = input('-----\nChoose a selection:\n    \
+        n: create device and add datastreams(新建)\n    \
+        r: reset thresholds to default values(重置).\n    \
+        s: set thresholds manualy(手动设定).\n    \
+        d: delete device and recreate device(删除)\n    \
+        m: manualy configure threhold values offline(离线手动设定)\n\
+        \nYour choice is(请选择): ')
 key = key.strip()
 if key in ['n', 'N']:
     api_key, device_id = register_device()
@@ -123,18 +129,31 @@ if key in ['d', 'D']:
 if key in ['s', 'S']:
     api_key, device_id = register_device()
     threshold_values = input(
-        'input 4 values,sepreated by dot (输入4个设定值，以逗号或空格分隔):  ')
+        'input 4 values,sepreated by dot (输入4个设定值，以逗号分隔):  ')
     try:
         if(len(threshold_values.split(','))) == 4:
             threshold_values = threshold_values.split(',')
-        else:
-            threshold_values = threshold_values.split(' ')
-
-        if len(threshold_values) != 4:
-            print('incorrect Number of values!(需要输入4个值)')
-        else:
             threshold_values = [int(i) for i in threshold_values]
             add_datapoints(api_key, device_id, *threshold_values)
+        else:
+            print('incorrect Number of values!(需要输入4个值)')
+    except:
+        print('input values incorrect!（输入值格式错误）')
+
+if key in ['m', 'M']:
+    threshold_values = input(
+        'input 4 values,sepreated by dot (输入4个设定值，以逗号分隔):  ')
+    print(len(threshold_values.split(',')))
+    try:
+        if len(threshold_values.split(',')) == 4:
+            threshold_values = threshold_values.split(',')
+            threshold_values = [int(i) for i in threshold_values]
+            with open('./output/cfg_table.lua', 'w', newline='') as f:
+                for i in threshold_values:
+                    f.writelines(str(i)+'\n')
+            print(threshold_values)
+        else:
+            print('incorrect Number of values!(需要输入4个值)')
     except:
         print('input values incorrect!（输入值格式错误）')
 
